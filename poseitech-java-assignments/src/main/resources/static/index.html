@@ -1,0 +1,154 @@
+ <!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>assignments</title>
+	<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+	<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+	<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+	
+	<style>
+		.result{
+			min-height: 50px;
+		    background-color: #389bff;
+		    color: white;
+		    padding: 2px;
+		    border-radius: 5px;
+		    font-size: 1.2em;
+		}
+
+	</style>
+</head>
+
+<body>
+	<div id="tabs">
+		<ul>
+		    <li><a href="#tabs-a">a. 查詢特定的學生</a></li>
+		    <li><a href="#tabs-b">b. 依條件查詢學生</a></li>
+		    <li><a href="#tabs-c-get">c. 查詢所有學生(get)</a></li>
+		    <li><a href="#tabs-c-post">c. 查詢所有學生(post)</a></li>
+		    <li><a href="#tabs-d">d. 新增一個學生</a></li>
+		    <li><a href="#tabs-e">e. 查詢各科成績的學生人數</a></li>
+		</ul>
+		<!-- a. 查詢特定的學生 -->
+		<div id="tabs-a" class="tab_div">
+			URL：<input type="text" name="url" size="80px" value="/assignments/api/v1/students/1/"><br>
+			Method：<input type="text" name="method" value="GET"><br>
+			<input type="button" class="send_btn" value="送出">
+			<p>
+			result：
+			<div>
+				<pre class="result"></pre>
+			</div>
+		</div>
+		<!-- b. 依條件查詢學生 -->
+		<div id="tabs-b" class="tab_div">
+			URL：<input type="text" name="url" size="80px" value="/assignments/api/v1/students?method=r"><br>
+			Method：<input type="text" name="method" value="POST"><br>
+			Content：<br>
+			<textarea name="content" rows="5" cols="100">
+{
+	"remark": "handsome"
+}			
+			</textarea>
+			<br>
+			<input type="button" class="send_btn" value="送出">
+			<p>
+			result：
+			<div>
+				<pre class="result"></pre>
+			</div>
+		</div>
+		<!-- c. 查詢所有學生(get) -->
+		<div id="tabs-c-get" class="tab_div">
+			URL：<input type="text" name="url" size="80px" value="/assignments/api/v1/students?start=0&limit=5"><br>
+			Method：<input type="text" name="method" value="GET"><br>
+			<input type="button" class="send_btn" value="送出">
+			<p>
+			result：
+			<div>
+				<pre class="result"></pre>
+			</div>
+		</div>
+		<!-- c. 查詢所有學生(post) -->
+		<div id="tabs-c-post" class="tab_div">
+			URL：<input type="text" name="url" size="80px" value="/assignments/api/v1/students"><br>
+			Method：<input type="text" name="method" value="POST"><br>
+			Content：<br>
+			<textarea name="content" rows="5" cols="100">
+{
+	"start":0,
+	"limit":5
+}			
+			</textarea>
+			<br>
+			<input type="button" class="send_btn" value="送出">
+			<p>
+			result：
+			<div>
+				<pre class="result"></pre>
+			</div>
+		</div>
+		<div id="tabs-d" class="tab_div">
+			URL：<input type="text" name="url" size="80px" value="/assignments/api/v1/students?method=c"><br>
+			Method：<input type="text" name="method" value="POST"><br>
+			Content：<br>
+			<textarea name="content" rows="5" cols="100">
+{
+	"name": "name01",
+	"registerDate": "20170509",
+	"remark": "some note"
+}		
+			</textarea>
+			<br>
+			<input type="button" class="send_btn" value="送出">
+			<p>
+			result：
+			<div>
+				<pre class="result"></pre>
+			</div>
+		</div>
+		<!-- e. 查詢各科成績的學生人數 -->
+		<div id="tabs-e" class="tab_div">
+			URL：<input type="text" name="url" size="80px" value="/assignments/api/v1/students/grades"><br>
+			Method：<input type="text" name="method" value="GET"><br>
+			<input type="button" class="send_btn" value="送出">
+			<p>
+			result：
+			<div>
+				<pre class="result"></pre>
+			</div>
+		</div>
+	</div>
+</body>
+</html> 
+
+<script>
+	$( function() {
+		$( "#tabs" ).tabs();
+		
+		$(".send_btn").on( "click", function() {
+			console.log( $( this ).text() );
+			var tabDiv = $(this).closest(".tab_div");
+			var url = tabDiv.find("input[name='url']").val();
+			var method = tabDiv.find("input[name='method']").val();
+			var content = tabDiv.find("textarea[name='content']").val();
+			var result = tabDiv.find(".result");
+			var btn = tabDiv.find(".send_btn");
+			
+			$.ajax({
+				  url: url,
+				  type: method,
+				  dataType: "json",
+				  contentType: "application/json; charset=utf-8",
+				  success: function(data) {
+					  result.text(JSON.stringify(data, null, 2));
+				  },					  
+				  error: function() {
+				    alert("ERROR!!!");
+				  },
+				  data:content,
+			});	
+		});
+	} );
+</script>
