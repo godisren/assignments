@@ -80,8 +80,6 @@ public class AssignmentController {
 					// d. 新增一個學生
 					NewStudentSuccessDto successStdDto = new NewStudentSuccessDto(
 							assignmentService.createStudent(studentDto));
-					System.out.println(successStdDto.getUrl());
-					
 					return new ResponseContent(successStdDto);
 				}
 			}
