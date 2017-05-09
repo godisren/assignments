@@ -3,6 +3,7 @@ package com.poseitech.assignment.entity;
 import java.io.Serializable;
 import java.util.Date;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -18,8 +19,12 @@ public class Project implements Serializable {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
+
+	@Column(nullable = false, length = 60)
 	private String name;
+	@Column(nullable = false)
 	private Date createDate;
+	@Column(length = 100)
 	private String remark;
 
 	public Project() {

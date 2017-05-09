@@ -17,6 +17,17 @@ public class ProjectDto implements Serializable {
 	private Date createDate;
 	private String remark;
 
+	public ProjectDto() {
+		super();
+	}
+
+	public ProjectDto(String name, Date createDate, String remark) {
+		super();
+		this.name = name;
+		this.createDate = createDate;
+		this.remark = remark;
+	}
+
 	public Integer getId() {
 		return id;
 	}
@@ -47,6 +58,11 @@ public class ProjectDto implements Serializable {
 
 	public void setRemark(String remark) {
 		this.remark = remark;
+	}
+
+	@Override
+	public String toString() {
+		return "ProjectDto [id=" + id + ", name=" + name + ", createDate=" + createDate + ", remark=" + remark + "]";
 	}
 
 	public static ProjectDto valueOf(Project p) {

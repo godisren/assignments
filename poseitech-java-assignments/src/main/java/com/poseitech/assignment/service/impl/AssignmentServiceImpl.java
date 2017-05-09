@@ -1,10 +1,12 @@
 package com.poseitech.assignment.service.impl;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.transaction.Transactional;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -116,8 +118,32 @@ public class AssignmentServiceImpl implements AssignmentService {
 		return toStudentDtoList(this.studentDao.findByExample(studentDto.toStudent()));
 	}
 
+	@Override
+	public List<ProjectDto> getProjectsByIds(List<Integer> projectIds) {
+		return toProjectDtoList(this.projectDao.findAll(projectIds));
+	}
+
+	@Override
+	public List<ProjectDto> getAllProjects() {
+		return toProjectDtoList(this.projectDao.findAll());
+	}
+
+	protected List<ProjectDto> toProjectDtoList(List<Project> proList) {
+		if (CollectionUtils.isEmpty(proList))
+			return Collections.emptyList();
+
+		List<ProjectDto> proDtoList = new ArrayList<ProjectDto>(proList.size());
+		for (Project s : proList)
+			proDtoList.add(ProjectDto.valueOf(s));
+
+		return proDtoList;
+	}
+
 	protected List<StudentDto> toStudentDtoList(List<Student> stuList) {
-		List<StudentDto> stuDtoList = new ArrayList<StudentDto>();
+		if (CollectionUtils.isEmpty(stuList))
+			return Collections.emptyList();
+
+		List<StudentDto> stuDtoList = new ArrayList<StudentDto>(stuList.size());
 		for (Student s : stuList)
 			stuDtoList.add(StudentDto.valueOf(s));
 

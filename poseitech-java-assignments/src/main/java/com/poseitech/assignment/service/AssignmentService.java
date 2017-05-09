@@ -40,4 +40,10 @@ public interface AssignmentService {
 
 	// 根據StudentDto屬性查詢學生
 	public List<StudentDto> getStudentsByExample(StudentDto studentDto) throws Exception;
+
+	// 根據多組id查詢專案
+	public List<ProjectDto> getProjectsByIds(List<Integer> projectIds);
+
+	// 查詢所有專案
+	public List<ProjectDto> getAllProjects();
 }

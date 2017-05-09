@@ -29,7 +29,6 @@ public class Student implements Serializable {
 	@Column(nullable = false, length = 60)
 	private String name;
 
-	@Column(nullable = false)
 	private Date birthday;
 
 	@Column(nullable = false)

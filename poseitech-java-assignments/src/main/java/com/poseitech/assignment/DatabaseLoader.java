@@ -7,9 +7,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
+import com.poseitech.assignment.dao.GradeDao;
 import com.poseitech.assignment.dao.ProjectDao;
 import com.poseitech.assignment.dao.StudentDao;
 import com.poseitech.assignment.dao.StudentProjectGradeDao;
+import com.poseitech.assignment.entity.Grade;
 import com.poseitech.assignment.entity.Project;
 import com.poseitech.assignment.entity.Student;
 import com.poseitech.assignment.entity.StudentProjectGrade;
@@ -20,12 +22,15 @@ public class DatabaseLoader implements CommandLineRunner {
 	private StudentDao studentDao;
 	private ProjectDao projectDao;
 	private StudentProjectGradeDao studentProjectGradeDao;
+	private GradeDao gradeDao;
+
 
 	@Autowired
-	public DatabaseLoader(StudentDao studentDao, ProjectDao projectDao, StudentProjectGradeDao studentProjectGradeDao) {
+	public DatabaseLoader(StudentDao studentDao, ProjectDao projectDao, StudentProjectGradeDao studentProjectGradeDao,GradeDao gradeDao) {
 		this.studentDao = studentDao;
 		this.projectDao = projectDao;
 		this.studentProjectGradeDao = studentProjectGradeDao;
+		this.gradeDao = gradeDao;
 	}
 
 	@Override
@@ -48,6 +53,12 @@ public class DatabaseLoader implements CommandLineRunner {
 		Project proEng = this.projectDao.save(new Project("English", now, "about English"));
 		Project proLiter = this.projectDao.save(new Project("Literature", now, "about Literature"));
 		Project proHist = this.projectDao.save(new Project("History", now, "about History"));
+		
+		// 新增成績評等
+		gradeDao.save(new Grade("A", "excellent"));
+		gradeDao.save(new Grade("B", "good"));
+		gradeDao.save(new Grade("C", "so so"));
+		gradeDao.save(new Grade("D", "bad"));
 
 		// 新增學生成績
 		// stone

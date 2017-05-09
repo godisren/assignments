@@ -26,6 +26,18 @@ public class StudentDto implements Serializable {
 
 	private List<ProjectDto> interestedProjects;
 
+	public StudentDto() {
+		super();
+	}
+
+	public StudentDto(String name, Date birthday, String registerDate, String remark) {
+		super();
+		this.name = name;
+		this.birthday = birthday;
+		this.registerDate = registerDate;
+		this.remark = remark;
+	}
+
 	@JsonIgnore
 	public Integer getId() {
 		return id;

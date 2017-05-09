@@ -1,9 +1,14 @@
 package com.poseitech.assignment.mvc.controller;
 
 import java.io.IOException;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -13,19 +18,22 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.poseitech.assignment.dto.NewStudentSuccessDto;
 import com.poseitech.assignment.dto.StudentDto;
 import com.poseitech.assignment.service.AssignmentService;
 
 @RestController
-@RequestMapping("/assignments/api/v1")
+@RequestMapping("/assignments/api/v1/students")
 public class AssignmentController {
-	
+	private static final Logger LOGGER = LoggerFactory.getLogger(AssignmentController.class);
 
+	@Autowired
+	private Environment environment;
 	@Autowired
 	private AssignmentService assignmentService;
 
 	// a.查詢特定的學生(GET)
-	@RequestMapping(value = "/students/{studentId}", method = RequestMethod.GET)
+	@RequestMapping(value = "/{studentId}", method = RequestMethod.GET)
 	public @ResponseBody ResponseContent getStudentById(@PathVariable("studentId") Integer id) {
 		try {
 			return new ResponseContent(assignmentService.getStudentById(id), null);
@@ -36,7 +44,7 @@ public class AssignmentController {
 	}
 
 	// c. 查詢所有學生
-	@RequestMapping(value = "/students", method = { RequestMethod.GET })
+	@RequestMapping(method = { RequestMethod.GET })
 	public @ResponseBody ResponseContent getStudentByPager(
 			@RequestParam(value = "start", required = false) Integer start,
 			@RequestParam(value = "limit", required = false) Integer limit) {
@@ -52,9 +60,9 @@ public class AssignmentController {
 		}
 	}
 
-	@RequestMapping(value = "/students", method = { RequestMethod.POST })
+	@RequestMapping(method = { RequestMethod.POST })
 	public @ResponseBody ResponseContent getStudentByQueryOrCreate(
-			@RequestParam(value = "method", required = false) String method, @RequestBody String body) {
+			@RequestParam(value = "_method", required = false) String method, @RequestBody String body) {
 
 		if (StringUtils.isBlank(body))
 			return ResponseContent.ERROR_INVALID_PARAMETER;
@@ -70,7 +78,11 @@ public class AssignmentController {
 					return new ResponseContent(assignmentService.getStudentsByExample(studentDto));
 				case "c":
 					// d. 新增一個學生
-					return new ResponseContent(assignmentService.createStudent(studentDto));
+					NewStudentSuccessDto successStdDto = new NewStudentSuccessDto(
+							assignmentService.createStudent(studentDto));
+					System.out.println(successStdDto.getUrl());
+					
+					return new ResponseContent(successStdDto);
 				}
 			}
 
@@ -89,13 +101,23 @@ public class AssignmentController {
 	}
 
 	// e. 查詢各科成績的學生人數
-	@RequestMapping(value = "/students/grades", method = { RequestMethod.GET })
+	@RequestMapping(value = "/grades", method = { RequestMethod.GET })
 	public @ResponseBody ResponseContent calculateGrades() {
 		try {
 			return new ResponseContent(this.assignmentService.calculateStudentStatistics());
 		} catch (Exception e) {
 			e.printStackTrace();
 			return new ResponseContent(StringUtils.EMPTY, e.getMessage());
+		}
+	}
+
+	public String getHostUrl() {
+		try {
+			return "http://" + InetAddress.getLocalHost().getHostAddress() + ":"
+					+ environment.getProperty("server.port");
+		} catch (UnknownHostException e) {
+			e.printStackTrace();
+			return "http://127.0.0.1:8080";
 		}
 	}
 
