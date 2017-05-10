@@ -7,6 +7,8 @@ import java.util.List;
 import javax.transaction.Transactional;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -24,6 +26,7 @@ import com.poseitech.assignment.service.AssignmentService;
 @Service
 @Transactional
 public class AssignmentServiceImpl implements AssignmentService {
+	private static final Logger LOGGER = LoggerFactory.getLogger(AssignmentServiceImpl.class);
 
 	@Autowired
 	private ProjectDao projectDao;
@@ -34,8 +37,7 @@ public class AssignmentServiceImpl implements AssignmentService {
 
 	@Override
 	public StudentDto createStudent(StudentDto pNewStudent) throws Exception {
-		Student s = studentDao.saveOrUpdate(pNewStudent.toStudent());
-		return StudentDto.valueOf(s);
+		return StudentDto.valueOf(studentDao.saveOrUpdate(pNewStudent.toStudent()));
 	}
 
 	@Override
@@ -55,7 +57,7 @@ public class AssignmentServiceImpl implements AssignmentService {
 		try {
 			studentDao.delete(pNewStudent.getId());
 		} catch (Exception e) {
-			e.printStackTrace();
+			LOGGER.error("刪除學生錯誤(" + pNewStudent + ")", e);
 			return false;
 		}
 		return true;
@@ -63,7 +65,6 @@ public class AssignmentServiceImpl implements AssignmentService {
 
 	@Override
 	public List<ProjectDto> getInterestedProjects(StudentDto pStudent) throws Exception {
-
 		List<Project> projects = studentDao.findProjectsByStudentId(pStudent.getId());
 		List<ProjectDto> proDtoList = new ArrayList<ProjectDto>();
 		for (Project p : projects)
@@ -73,12 +74,12 @@ public class AssignmentServiceImpl implements AssignmentService {
 
 	@Override
 	public StudentDto registerProjects(Integer pStudendId, List<ProjectDto> pProjects) throws Exception {
-
-		StudentProjectGrade spg = null;
+		List<StudentProjectGrade> spgGpgList = new ArrayList<StudentProjectGrade>();
 		for (ProjectDto proDto : pProjects) {
-			spg = new StudentProjectGrade(new StudentProjectGrade.Key(pStudendId, proDto.getId()));
-			studentProjectGradeDao.save(spg);
+			spgGpgList.add(new StudentProjectGrade(new StudentProjectGrade.Key(pStudendId, proDto.getId())));
 		}
+
+		studentProjectGradeDao.save(spgGpgList);
 
 		return StudentDto.valueOf(studentDao.findById(pStudendId));
 	}

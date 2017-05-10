@@ -36,10 +36,10 @@ public class AssignmentController {
 	@RequestMapping(value = "/{studentId}", method = RequestMethod.GET)
 	public @ResponseBody ResponseContent getStudentById(@PathVariable("studentId") Integer id) {
 		try {
-			return new ResponseContent(assignmentService.getStudentById(id), null);
+			return ResponseContent.create(assignmentService.getStudentById(id), null);
 		} catch (Exception e) {
-			e.printStackTrace();
-			return new ResponseContent(StringUtils.EMPTY, e.getMessage());
+			LOGGER.error("查詢特定學生錯誤", e);
+			return ResponseContent.create(StringUtils.EMPTY, e.getMessage());
 		}
 	}
 
@@ -53,10 +53,11 @@ public class AssignmentController {
 			return ResponseContent.ERROR_INVALID_PARAMETER;
 
 		try {
-			return new ResponseContent(assignmentService.getAllStudents(start, limit));
+
+			return ResponseContent.create(assignmentService.getAllStudents(start, limit));
 		} catch (Exception e) {
-			e.printStackTrace();
-			return new ResponseContent(StringUtils.EMPTY, e.getMessage());
+			LOGGER.error("查詢所有學生錯誤", e);
+			return ResponseContent.create(StringUtils.EMPTY, e.getMessage());
 		}
 	}
 
@@ -74,25 +75,25 @@ public class AssignmentController {
 
 				switch (method) {
 				case "r":
-					// b.依條件查詢學生
-					return new ResponseContent(assignmentService.getStudentsByExample(studentDto));
+					// b. 依條件查詢學生
+					return ResponseContent.create(assignmentService.getStudentsByExample(studentDto));
 				case "c":
 					// d. 新增一個學生
 					NewStudentSuccessDto successStdDto = new NewStudentSuccessDto(
 							assignmentService.createStudent(studentDto));
-					return new ResponseContent(successStdDto);
+					return ResponseContent.create(successStdDto);
 				}
 			}
 
 			// c. 查詢所有學生(post)
 			PagerBean pager = PagerBean.valueOf(body);
 			if (pager.getStart() != null && pager.getLimit() != null) {
-				return new ResponseContent(assignmentService.getAllStudents(pager.getStart(), pager.getLimit()));
+				return ResponseContent.create(assignmentService.getAllStudents(pager.getStart(), pager.getLimit()));
 			}
 
 		} catch (Exception e) {
-			e.printStackTrace();
-			return new ResponseContent(StringUtils.EMPTY, e.getMessage());
+			LOGGER.error("處理學生服務錯誤(method=" + method + ")", e);
+			return ResponseContent.create(StringUtils.EMPTY, e.getMessage());
 		}
 
 		return ResponseContent.ERROR_INVALID_PARAMETER;
@@ -102,10 +103,10 @@ public class AssignmentController {
 	@RequestMapping(value = "/grades", method = { RequestMethod.GET })
 	public @ResponseBody ResponseContent calculateGrades() {
 		try {
-			return new ResponseContent(this.assignmentService.calculateStudentStatistics());
+			return ResponseContent.create(this.assignmentService.calculateStudentStatistics());
 		} catch (Exception e) {
-			e.printStackTrace();
-			return new ResponseContent(StringUtils.EMPTY, e.getMessage());
+			LOGGER.error("查詢各科成績的學生人數錯誤", e);
+			return ResponseContent.create(StringUtils.EMPTY, e.getMessage());
 		}
 	}
 
@@ -120,10 +121,18 @@ public class AssignmentController {
 	}
 
 	public static class ResponseContent {
-		public static final ResponseContent ERROR_INVALID_PARAMETER = new ResponseContent(null, "無效的參數");
+		public static final ResponseContent ERROR_INVALID_PARAMETER = ResponseContent.create(null, "無效的參數");
 
 		private Object data;
 		private String error;
+
+		public static ResponseContent create(Object data) {
+			return new ResponseContent(data);
+		}
+
+		public static ResponseContent create(Object data, String error) {
+			return new ResponseContent(data, error);
+		}
 
 		public ResponseContent() {
 			super();
