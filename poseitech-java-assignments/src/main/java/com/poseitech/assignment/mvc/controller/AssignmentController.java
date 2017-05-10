@@ -1,8 +1,6 @@
 package com.poseitech.assignment.mvc.controller;
 
 import java.io.IOException;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -80,7 +78,7 @@ public class AssignmentController {
 				case "c":
 					// d. 新增一個學生
 					NewStudentSuccessDto successStdDto = new NewStudentSuccessDto(
-							assignmentService.createStudent(studentDto));
+							assignmentService.createStudent(studentDto), getServerUrl());
 					return ResponseContent.create(successStdDto);
 				}
 			}
@@ -110,14 +108,9 @@ public class AssignmentController {
 		}
 	}
 
-	public String getHostUrl() {
-		try {
-			return "http://" + InetAddress.getLocalHost().getHostAddress() + ":"
-					+ environment.getProperty("server.port");
-		} catch (UnknownHostException e) {
-			e.printStackTrace();
-			return "http://127.0.0.1:8080";
-		}
+	public String getServerUrl() {
+		return environment.getProperty("server.url") + ":" + environment.getProperty("server.port");
+
 	}
 
 	public static class ResponseContent {

@@ -1,5 +1,6 @@
 package com.poseitech.assignment.mvc.controller;
 
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -24,12 +25,12 @@ import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
+import org.springframework.core.env.Environment;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.poseitech.assignment.MyApplication;
@@ -53,6 +54,9 @@ public class AssignmentControllerTest {
 	private AssignmentController target;
 	@Mock
 	private AssignmentService assignmentService;
+	@Mock
+	private Environment env;
+
 	@Autowired
 	private ObjectMapper mapper;
 
@@ -113,6 +117,11 @@ public class AssignmentControllerTest {
 	// d.新增一個學生
 	@Test
 	public void testCreateStudent() throws Exception {
+		String serverUrl = "http://127.0.0.1";
+		String serverPort = "10080";
+		when(env.getProperty("server.url")).thenReturn(serverUrl);
+		when(env.getProperty("server.port")).thenReturn(serverPort);
+
 		StudentDto newStdDto = new StudentDto("new man", null, "20170101", "nich guy");
 
 		String postContent = mapper.writeValueAsString(newStdDto);
@@ -123,8 +132,8 @@ public class AssignmentControllerTest {
 				.perform(post(prefixUrl + "?_method=c").content(postContent)
 						.accept(MediaType.parseMediaType("application/json;charset=UTF-8")))
 				.andExpect(status().isOk()).andExpect(content().contentType("application/json;charset=UTF-8"))
-				.andExpect(content().json(mapper.writeValueAsString(
-						new AssignmentController.ResponseContent(new NewStudentSuccessDto(newStdDto)))));
+				.andExpect(content().json(mapper.writeValueAsString(new AssignmentController.ResponseContent(
+						new NewStudentSuccessDto(newStdDto, serverUrl + ":" + serverPort)))));
 	}
 
 	// e.查詢各科成績的學生人數
